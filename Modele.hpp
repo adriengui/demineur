@@ -125,15 +125,28 @@ class Modele {
 			return n;
 		}
 		
-		void genererBombes(const int nbBombes) {
+		bool in_entourage(const int ligne, const int colonne, const int a, const int b) {
+			for(int x=ligne-1;x<=ligne+1;x++)
+				for(int y=colonne-1;y<=colonne+1;y++)
+					if(a==x && b==y)
+						return true;
+			return false;
+		}
+		
+		void genererBombes(const int nbBombes, const int ligne, const int colonne) {
 			srand(time(nullptr));
+			int a,b;
 			// vector<pair<int,int>> b = {{0,2},{1,1},{2,0},{0,6},{3,5},{5,5},{5,8},{6,1},{6,2},{7,1}};
-			while(getNbBombes()!=nbBombes)
+			while(getNbBombes()!=nbBombes) {
 //			for(const auto& x : b)
-				getCellRef(rand()%nbLignes_, rand()%nbColonnes_).setBombe();
+				a=rand()%nbLignes_;
+				b=rand()%nbColonnes_;
+				if(!in_entourage(ligne, colonne, a, b))
+					getCellRef(a, b).setBombe();
+			}
 		  }
 		
-		void init(const int nbL, const int nbC, const int nbBombes) {
+		void init(const int nbL, const int nbC) {
 			nbLignes_=nbL;
 			nbColonnes_=nbC;
 			nbElems_=nbL*nbC;
@@ -142,17 +155,15 @@ class Modele {
 			for(auto &x:grille_)
 				x.init();
 			// toStringBis();
-			genererBombes(nbBombes);
-			calculerGrille();
+			//genererBombes(nbBombes, ligne, colonne);
+			//calculerGrille();
 			// toStringBis();
 		  }
 
 		void openCell(const int i, const int j) {
 			Cell cell=getCell(i,j);
-			// cout << 5 << endl;
 			if(!cell.isBombe() && !cell.getOpen()){
 				getCellRef(i,j).setOpen(true);
-				// cout << "a" << endl;
 				if(cell.getNb()==0) {
 					for(int x=i-1;x<=i+1;x++)
 						for(int y=j-1;y<=j+1;y++)
@@ -173,7 +184,7 @@ class Modele {
 			}
 			return true;
 		}
-
+		
 		void openAll() {
 			for(int i=0;i<nbLignes_;i++)
 				for(int j=0;j<nbColonnes_;j++)

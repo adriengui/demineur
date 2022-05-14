@@ -10,19 +10,22 @@
 #include <gtkmm/main.h>
 #include <gtkmm/table.h>
 #include <gtkmm/window.h>
+#include <gtkmm/buttonbox.h>
+#include <gtkmm/label.h>
+
 #include <vector>
 
 using namespace std;
 
 class Vue : public Gtk::Window {
 	private :
-		Gtk::Table appli, grille;
-		vector<Gtk::Button> boutons_accueil, boutons_grille;
-		Gtk::Button bouton_retour;
-      //  Gtk::Button bouton1, bouton2;
+		Gtk::Table appli, grille,fenetre;
+		Gtk::VButtonBox menu;
+		vector<Gtk::Button> boutons_accueil, boutons_grille, boutons_menu;
+		Gtk::Label info;
       
     public :
-        Vue() : appli(1,2) { 
+        Vue() : appli(1,2), fenetre(2,1) { 
 			//int l=4,c=4;
 			// Gtk::Table tableau(l, c);
 			/*add(tableau);
@@ -62,6 +65,22 @@ class Vue : public Gtk::Window {
 			return grille;
 		  }
 		  
+		  const Gtk::Table& getFenetre() const {
+			return fenetre;
+		  }
+		  
+		   Gtk::Table& getFenetreRef() {
+			return fenetre;
+		  }
+		  
+		  const Gtk::VButtonBox& getMenu() const {
+			return menu;
+		  }
+		  
+		   Gtk::VButtonBox& getMenuRef() {
+			return menu;
+		  }
+		  
 		  const vector<Gtk::Button>& getBoutonsAccueil() const {
 			return boutons_accueil;
 		  }
@@ -78,14 +97,21 @@ class Vue : public Gtk::Window {
 			return boutons_grille;
 		  }
 		  
-		  const Gtk::Button& getBoutonRetour() const {
-			return bouton_retour;
+		  const vector<Gtk::Button>& getBoutonsMenu() const {
+			return boutons_menu;
 		  }
 		  
-		Gtk::Button& getBoutonRetourRef() {
-			return bouton_retour;
+		vector<Gtk::Button>& getBoutonsMenuRef() {
+			return boutons_menu;
+		  }   
+		  
+		  const Gtk::Label& getInfo() const {
+			return info;
 		  }
-    
+		  
+		Gtk::Label& getInfoRef() {
+			return info;
+		  }  
     
 };
 
