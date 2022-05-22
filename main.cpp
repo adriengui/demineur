@@ -4,9 +4,9 @@
 #include "Vue.hpp"
 #include "Controleur.hpp"
 
-int main(int argc, char* argv[]) {
-	
+int main(int argc, char* argv[]) {	
     Gtk::Main app(argc, argv);
+
     Vue *vue=new Vue;
     Modele *modele=new Modele;
     Controleur(modele,vue);

@@ -46,10 +46,6 @@ public :
       show_all();	*/
   }
 
-  void run() {
-    Gtk::Main::run(*this);
-  }
-  
   const Gtk::Table& getAppli() const {
     return appli;
   }
