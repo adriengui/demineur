@@ -4,52 +4,20 @@
 #include <cstdlib>
 #include <ctime>
 
+#include "Observable.hpp"
+#include "Cell.hpp"
+
 using namespace std;
 
-class Cell {
-	private:
-		int nb;
-		bool open;
-	public:
-		Cell(const int n=0, const bool o=false) : nb(n), open(o) { }
-		
-		void init() {
-			setNb();
-			setOpen();
-		}
-		
-		void setNb(const int n=0) {
-			nb=n;
-		}
-		
-		void setOpen(const bool o=false) {
-			open=o;
-		}
-		
-		int getNb() const {
-			return nb;
-		}
-		
-		bool getOpen() const {
-			return open;
-		}
-		
-		bool isBombe() const {
-			return getNb()==-1;
-		}
-		
-		void setBombe() {
-			setNb(-1);
-		}
-	
-};
-
-class Modele {
+class Modele : public Observable<vector<vector<Cell>>> {
 	private:
 		int nbLignes_;
-		  int nbColonnes_;
-		  int nbElems_;
-		  vector<Cell> grille_;
+		int nbColonnes_;
+		int nbElems_;
+		int nbBombes_;
+		bool debut,fin;
+			
+		vector<vector<Cell>> grille_;
 	
 	public :
 		/*Modele(const int nbL, const int nbC) : nbLignes_(nbL), nbColonnes_(nbC), nbElems_(nbL*nbC) {
@@ -59,12 +27,12 @@ class Modele {
 		Modele() { }
 		
 		const Cell& getCell(const int i, const int j) const {
-			return grille_[i * nbColonnes_ + j];
-		  }
+			return grille_[i][j];
+		}
 		  
-		  Cell& getCellRef(const int i, const int j) {
-			return grille_[i * nbColonnes_ + j];
-		  }
+		Cell& getCellRef(const int i, const int j) {
+			return grille_[i][j];
+		}
 		
 		void toString() {
 			Cell cell;
@@ -108,7 +76,7 @@ class Modele {
 								if(x>=0 && x<nbLignes_ && y>=0 && y<nbColonnes_ && !(x==l && y==c))
 									if(getCell(x,y).isBombe())
 										n++;
-					
+						
 						getCellRef(l,c).setNb(n);
 					}
 				}
@@ -146,14 +114,20 @@ class Modele {
 			}
 		  }
 		
-		void init(const int nbL, const int nbC) {
+		void init(const int nbL, const int nbC, const int nbB) {
+			debut=true;
+			fin=false;
 			nbLignes_=nbL;
 			nbColonnes_=nbC;
 			nbElems_=nbL*nbC;
-			grille_.resize(nbElems_);
-			
-			for(auto &x:grille_)
-				x.init();
+			nbBombes_=nbB;
+			grille_.clear();
+			for(int x=0;x<nbLignes_;x++) {
+				vector<Cell> a;
+				for(int y=0;y<nbColonnes_;y++)
+					a.push_back(Cell());
+				grille_.push_back(a);
+			}
 			// toStringBis();
 			//genererBombes(nbBombes, ligne, colonne);
 			//calculerGrille();
@@ -170,6 +144,30 @@ class Modele {
 							if(x>=0 && x<nbLignes_ && y>=0 && y<nbColonnes_ && !(x==i && y==j))
 								openCell(x,y);
 				}
+			}
+		}
+		
+		void open(const int x, const int y) {
+			if(!fin) {
+				if(debut) {
+					genererBombes(nbBombes_, x, y);
+					calculerGrille();
+					debut=false;
+				}
+				toStringBis();
+				openCell(x,y);
+				
+				/*if(modele_->gagne()) {
+					vue_->getInfoRef().set_text("GAGNE !");
+					modele_->openAll();
+					end=true;
+				} else if(modele_->getCellRef(x,y).isBombe()) {
+					vue_->getInfoRef().set_text("PERDU !");
+					modele_->openAll();
+					end=true;
+				}*/
+				
+				notifyObservers(grille_);
 			}
 		}
 
@@ -193,9 +191,9 @@ class Modele {
 		
 		int getLignes() const {
 			return nbLignes_;
-		  }
+		}
 
-		  int getColonnes() const {
+		int getColonnes() const {
 			return nbColonnes_;
-		  }
+		}
 };

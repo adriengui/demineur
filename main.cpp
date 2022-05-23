@@ -1,16 +1,20 @@
-#include <gtkmm/main.h>
+#include <gtkmm/application.h>
 
 #include "Modele.hpp"
 #include "Vue.hpp"
 #include "Controleur.hpp"
 
+using namespace std;
+
 int main(int argc, char* argv[]) {
 	
-    Gtk::Main app(argc, argv);
-    Vue *vue=new Vue;
+    auto app = Gtk::Application::create(argc, argv);
+    
     Modele *modele=new Modele;
+    Vue *vue=new Vue;
     Controleur(modele,vue);
     
-    Gtk::Main::run(*vue);
-    return 0;
+    modele->addObserver(vue);
+    
+    return app->run(*vue);
 }
