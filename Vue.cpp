@@ -103,8 +103,8 @@ void Vue::fillGrille(Jeu g) {
 					if(n!=-1)
 						boutons_grille[x*c+y].set_label(to_string(n));
 					else {
-						bombe = Gtk::manage(new Gtk::Image{"bombe.png"});
-						boutons_grille[x*c+y].add(*bombe);
+						bombe = Gtk::Image("bombe.png");
+						boutons_grille[x*c+y].add(bombe);
 					}
 				}
 			}

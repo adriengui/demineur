@@ -25,7 +25,7 @@ class Vue : public Gtk::Window, public Observer<Jeu> {
 		Gtk::Label info;
 		Gtk::VButtonBox menu;
 		vector<Gtk::Button> boutons_accueil, boutons_grille, boutons_menu;
-		Gtk::Image* bombe;
+		Gtk::Image bombe;
 		
     public :
         Vue();
