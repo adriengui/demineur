@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Observer.hpp"
-
 #include <list>
+
+#include "Observer.hpp"
 
 using namespace std;
 

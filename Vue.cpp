@@ -1,4 +1,3 @@
-#include <string>
 #include <iostream>
 #include <vector>
 
@@ -18,7 +17,6 @@ Vue::Vue() : appli(1,2), fenetre(2,1), grille(2,2), info("") {
 	
 	for(int x=0;x<3;x++)
 		boutons_accueil[x].set_can_focus(false);
-				//boutons_accueil[x].signal_clicked().connect(sigc::bind<int>(sigc::mem_fun(*this, &Controleur::genere),x));
 				
 	afficheAccueil();
 	
@@ -43,7 +41,7 @@ Vue::Vue() : appli(1,2), fenetre(2,1), grille(2,2), info("") {
 
 Vue::~Vue() { } 
 
-void Vue::update(vector<vector<Cell>> g) {
+void Vue::update(Jeu g) {
 	fillGrille(g);
 }
 
@@ -72,11 +70,10 @@ void Vue::afficheJeu(Controleur *c, int m, int n) {
 		grille.remove(x);
 	for(int x=0;x<m;x++) {
 		for(int y=0;y<n;y++) {
-			boutons_grille.push_back(Gtk::Button(""));				
+			boutons_grille.push_back(Gtk::Button());				
 			boutons_grille[x*n+y].set_can_focus(false);
 			boutons_grille[x*n+y].set_relief(Gtk::RELIEF_NORMAL);
 			addOpenListener(c,m,n,x,y);
-			// boutons_grille[x*n+y].signal_clicked().connect(sigc::bind<Controleur *,int,int,int, int>(sigc::mem_fun(*this, &Controleur::on_button_open),c,m,n,x,y));
 		}
 	}
 	
@@ -87,30 +84,41 @@ void Vue::afficheJeu(Controleur *c, int m, int n) {
 	show_all();
 }
 
-void Vue::fillGrille(vector<vector<Cell>> g) {
-	int l=g.size(),c=g[0].size();
+void Vue::fillGrille(Jeu g) {
+	int l=g.getGrille().size(),c=g.getGrille()[0].size();
+	switch(g.getEtat()) {
+	case 1:
+		info.set_text("GAGNE !");
+		break;
+	case 2:
+		info.set_text("PERDU !");
+		break;
+	}
 	for(int x=0;x<l;x++) {
 		for(int y=0;y<c;y++) {
-			if(g[x][y].getOpen()) {
+			if(g.getCell(x,y).getOpen()) {
 				boutons_grille[x*c+y].set_relief(Gtk::RELIEF_NONE);
-				int n=g[x][y].getNb();
+				int n=g.getCell(x,y).getNb();
 				if(n!=0) {
 					if(n!=-1)
 						boutons_grille[x*c+y].set_label(to_string(n));
-					else
-						boutons_grille[x*c+y].set_label("B");
+					else {
+						bombe = Gtk::manage(new Gtk::Image{"bombe.png"});
+						boutons_grille[x*c+y].add(*bombe);
+					}
 				}
 			}
 		}
 	}
-}
-
-void Vue::addExitListener(Controleur *c) {
-	boutons_menu[1].signal_clicked().connect(sigc::mem_fun(*c, &Controleur::on_button_exit));
+	show_all();
 }
 
 void Vue::addAccueilListener(Controleur *c) {
 	boutons_menu[0].signal_clicked().connect(sigc::mem_fun(*c, &Controleur::on_button_accueil));
+}
+
+void Vue::addExitListener(Controleur *c) {
+	boutons_menu[1].signal_clicked().connect(sigc::mem_fun(*c, &Controleur::on_button_exit));
 }
 
 void Vue::addDimensionListener(Controleur *c, int x) {
@@ -121,10 +129,10 @@ void Vue::addOpenListener(Controleur *c, int m, int n, int x, int y) {
 	boutons_grille[x*n+y].signal_clicked().connect(sigc::bind<int, int>(sigc::mem_fun(*c, &Controleur::on_button_open),x,y));
 }
 
-void Vue::on_button_exit() {
-	hide();
-}
-
 void Vue::on_button_accueil() {
 	afficheAccueil();
+}
+
+void Vue::on_button_exit() {
+	hide();
 }

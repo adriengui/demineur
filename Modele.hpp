@@ -6,10 +6,11 @@
 
 #include "Observable.hpp"
 #include "Cell.hpp"
+#include "Jeu.hpp"
 
 using namespace std;
 
-class Modele : public Observable<vector<vector<Cell>>> {
+class Modele : public Observable<Jeu> {
 	private:
 		int nbLignes_;
 		int nbColonnes_;
@@ -17,21 +18,18 @@ class Modele : public Observable<vector<vector<Cell>>> {
 		int nbBombes_;
 		bool debut,fin;
 			
-		vector<vector<Cell>> grille_;
+		Jeu jeu;
 	
 	public :
-		/*Modele(const int nbL, const int nbC) : nbLignes_(nbL), nbColonnes_(nbC), nbElems_(nbL*nbC) {
-			grille_.resize(nbElems_);
-		}*/
 		
 		Modele() { }
 		
 		const Cell& getCell(const int i, const int j) const {
-			return grille_[i][j];
+			return jeu.getCell(i,j);
 		}
 		  
 		Cell& getCellRef(const int i, const int j) {
-			return grille_[i][j];
+			return jeu.getCellRef(i,j);
 		}
 		
 		void toString() {
@@ -104,35 +102,32 @@ class Modele : public Observable<vector<vector<Cell>>> {
 		void genererBombes(const int nbBombes, const int ligne, const int colonne) {
 			srand(time(nullptr));
 			int a,b;
-			// vector<pair<int,int>> b = {{0,2},{1,1},{2,0},{0,6},{3,5},{5,5},{5,8},{6,1},{6,2},{7,1}};
+			
 			while(getNbBombes()!=nbBombes) {
-//			for(const auto& x : b)
+
 				a=rand()%nbLignes_;
 				b=rand()%nbColonnes_;
 				if(!in_entourage(ligne, colonne, a, b))
 					getCellRef(a, b).setBombe();
 			}
-		  }
+		}
 		
 		void init(const int nbL, const int nbC, const int nbB) {
 			debut=true;
 			fin=false;
+			jeu.setEtat(0);
 			nbLignes_=nbL;
 			nbColonnes_=nbC;
 			nbElems_=nbL*nbC;
 			nbBombes_=nbB;
-			grille_.clear();
+			jeu.getGrille().clear();
 			for(int x=0;x<nbLignes_;x++) {
 				vector<Cell> a;
 				for(int y=0;y<nbColonnes_;y++)
 					a.push_back(Cell());
-				grille_.push_back(a);
+				jeu.getGrille().push_back(a);
 			}
-			// toStringBis();
-			//genererBombes(nbBombes, ligne, colonne);
-			//calculerGrille();
-			// toStringBis();
-		  }
+		}
 
 		void openCell(const int i, const int j) {
 			Cell cell=getCell(i,j);
@@ -154,20 +149,19 @@ class Modele : public Observable<vector<vector<Cell>>> {
 					calculerGrille();
 					debut=false;
 				}
-				toStringBis();
+			
 				openCell(x,y);
 				
-				/*if(modele_->gagne()) {
-					vue_->getInfoRef().set_text("GAGNE !");
-					modele_->openAll();
-					end=true;
-				} else if(modele_->getCellRef(x,y).isBombe()) {
-					vue_->getInfoRef().set_text("PERDU !");
-					modele_->openAll();
-					end=true;
-				}*/
+				if(gagne() || getCellRef(x,y).isBombe()) {
+					if(gagne())
+						jeu.setEtat(1);
+					else
+						jeu.setEtat(2);
+					openAll();
+					fin=true;
+				}
 				
-				notifyObservers(grille_);
+				notifyObservers(jeu);
 			}
 		}
 
