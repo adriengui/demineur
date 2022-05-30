@@ -1,1 +1,0 @@
-parallels@ubuntu-linux-20-04-desktop.596845:1650058313
