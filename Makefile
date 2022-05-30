@@ -5,7 +5,7 @@ CC = g++
 CFLAGS = $(GTKMM_CF) -Wall
 LDFLAGS = $(GTKMM_LD)
 
-SRC = main.cpp
+SRC = main.cpp Vue.cpp
 PROG = main
 OBJS = $(SRC:.cpp=.o)
 .SUFFIXES: .cpp .o
@@ -16,6 +16,7 @@ $(PROG): $(OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 main.o: Modele.hpp Vue.hpp Controleur.hpp
+Vue.o: Vue.hpp Controleur.hpp
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $<
