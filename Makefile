@@ -2,7 +2,7 @@ GTKMM_CF = `pkg-config gtkmm-3.0 --cflags`
 GTKMM_LD = `pkg-config gtkmm-3.0 --libs`
 
 CC = g++
-CFLAGS = $(GTKMM_CF) -Wall
+CFLAGS = $(GTKMM_CF) -Wall --std=c++17 -g
 LDFLAGS = $(GTKMM_LD)
 
 SRC = main.cpp Vue.cpp
