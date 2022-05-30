@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 #include "Vue.hpp"
 #include "Controleur.hpp"
@@ -116,6 +117,34 @@ void Vue::afficheJeu(Controleur *c, int m, int n) {
 	menu.attach(boutons_menu[3], 0,1,2,3);
 	menu.attach(titreScores, 0,1,4,5);
 	menu.attach(scores, 0,1,5,6);
+	
+	string file=to_string(m)+"x"+to_string(n)+".txt";
+	ifstream fi(file);
+	vector<int> v;
+	int line;
+	if(fi.is_open()) {
+		while(fi >> line)
+			v.push_back(line);
+	}
+	fi.close();
+	
+	sort(v.begin(), v.end());
+	
+	string r;
+	int i=1,min,sec;
+	for(auto x:v) {
+		min=x/60;
+		sec=x-60*min;
+		r+=to_string(i++)+" : ";
+		if(min<10)
+			r+="0";
+		r+=to_string(min)+":";
+		if(sec<10)
+			r+="0";
+		r+=to_string(sec)+"\n";
+	}
+	
+	scores.set_text(r);
 	
 	for(auto &x:boutons_accueil)
 		grille.remove(x);
