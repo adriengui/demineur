@@ -187,24 +187,27 @@ class Modele : public Observable<Jeu> {
 					v.push_back(line);
 			}
 			fi.close();
-			ofstream fo(file);
+			
 			int t=60*jeu.getMinutes()+jeu.getSecondes();
-			if(v.size()<10)
-				v.push_back(t);
-			else {
-				sort(v.begin(), v.end());
-				for(auto x:v) {
-					if(x>=t) {
-						v[9]=t;
-						break;
+			vector<int>::iterator it=find (v.begin(), v.end(), t);
+			if (it == v.end()) {
+				ofstream fo(file);
+				if(v.size()<10)
+					v.push_back(t);
+				else {
+					sort(v.begin(), v.end());
+					for(auto x:v) {
+						if(x>t) {
+							v[9]=t;
+							break;
+						}
 					}
 				}
-			}
-			for(auto x:v)
-				fo << x << endl;
-			
-			// fi.close();
-			fo.close();
+				for(auto x:v)
+					fo << x << endl;
+					
+				fo.close();
+			}			
 		}
 		
 		void processOpenCell(const int x, const int y) {
@@ -215,7 +218,7 @@ class Modele : public Observable<Jeu> {
 					jeu.setDebut(false);
 					Glib::signal_timeout().connect([this] {return this->computeTime();}, 1000);
 				}
-			
+				
 				savePreviousCommand();
 				openCell(x,y);
 				
@@ -232,6 +235,7 @@ class Modele : public Observable<Jeu> {
 				
 				jeu.setGrilleTime(0);
 				notifyObservers(jeu);
+				
 				// clearRedo();
 			}
 		}
