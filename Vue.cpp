@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "Vue.hpp"
 #include "Controleur.hpp"
@@ -38,15 +39,10 @@ Vue::Vue() : appli(1,2), fenetre(2,1), grille(2,2), menu(7,1), info(""), chronom
     boutons_menu[x].set_can_focus(false);
     boutons_menu[x].set_size_request(50,50);
   }
-  /*string t;
-    for(int x=1;x<=10;x++)
-    t+=to_string(x)+" :\n";
-    scores.set_text(t);*/
+
 		
   menu.attach(boutons_menu[0], 0,1,0,1);
   menu.attach(chronomsg, 0,1,3,4);
-  // menu.attach(titreScores, 0,1,2,3);
-  // menu.attach(scores, 0,1,3,4);
   menu.attach(boutons_menu[1], 0,1,6,7);
 			
   fenetre.attach(grille, 0,1,0,1);
@@ -112,6 +108,35 @@ void Vue::afficheJeu(Controleur *c, int m, int n) {
   menu.attach(boutons_menu[3], 0,1,2,3);
   menu.attach(titreScores, 0,1,4,5);
   menu.attach(scores, 0,1,5,6);
+
+  string file=to_string(m)+"x"+to_string(n)+".txt";
+  ifstream fi(file);
+  vector<int> v;
+  int line;
+  if(fi.is_open()) {
+    while(fi >> line)
+      v.push_back(line);
+  }
+  fi.close();
+	
+  sort(v.begin(), v.end());
+	
+  string r;
+  int i=1,min,sec;
+  for(auto x:v) {
+    min=x/60;
+    sec=x-60*min;
+    r+=to_string(i++)+" : ";
+    if(min<10)
+      r+="0";
+    r+=to_string(min)+":";
+    if(sec<10)
+      r+="0";
+    r+=to_string(sec)+"\n";
+  }
+	
+  scores.set_text(r);
+	
 	
   for(auto &x:boutons_accueil)
     grille.remove(x);
@@ -120,8 +145,8 @@ void Vue::afficheJeu(Controleur *c, int m, int n) {
       boutons_grille.push_back(Gtk::Button());				
       boutons_grille[x*n+y].set_can_focus(false);
       boutons_grille[x*n+y].set_relief(Gtk::RELIEF_NORMAL);
-      int bWidth = min(width_ / n, 50);
-      int bHeight = min(height_ / m, 50);
+      int bWidth = std::min(width_ / n, 50);
+      int bHeight = std::min(height_ / m, 50);
       boutons_grille[x*n+y].set_size_request(bWidth, bHeight);
       addOpenListener(c,m,n,x,y);
       addFlagListener(c,n,x,y);
@@ -164,12 +189,15 @@ void Vue::fillGrille(Jeu g) {
 	    bouton.set_label(to_string(n));
 	  } else {
 	    bouton.set_always_show_image();
+	    bouton.set_relief(Gtk::RELIEF_NORMAL);
 	    bouton.set_image(bombeImage = Gtk::Image("bombe.png"));
 	  }
 	}
       } else if(cell.getState() == flag) {
 	bouton.set_always_show_image();
 	bouton.set_image(flagImage = Gtk::Image("flag.png"));
+        bouton.set_label("");
+	
       } else {
 	bouton.set_image(flagImage = Gtk::Image());
 	bouton.set_always_show_image(false);

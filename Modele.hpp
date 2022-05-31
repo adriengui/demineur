@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <ctime>
+#include <fstream>
 #include <glibmm.h>
 
 #include "Observable.hpp"
@@ -172,9 +174,41 @@ public :
     }
   }
 		
-  void saveScore() {
-    
-  }
+  void saveScore(int nbL, int nbC) {
+    	
+    string file = to_string(nbL) + "x" + to_string(nbC) + ".txt";
+    ifstream fi(file);
+			
+    vector<int> v;
+    int line;
+    if(fi.is_open()) {
+      while(fi >> line)
+	v.push_back(line);
+    }
+    fi.close();
+			
+    int t = 60*jeu.getMinutes()+jeu.getSecondes();
+    vector<int>::iterator it=find (v.begin(), v.end(), t);
+    if (it == v.end()) {
+      ofstream fo(file);
+      if(v.size()<10)
+	v.push_back(t);
+      else {
+	sort(v.begin(), v.end());
+	for(auto x:v) {
+	  if(x>t) {
+	    v[9] = t;
+	    break;
+	  }
+	}
+      }
+      for(auto x:v)
+	fo << x << endl;
+					
+      fo.close();
+    }			
+  
+}
 		
   void processOpenCell(const int x, const int y) {
     Cell& cell = getCellRef(x,y);
@@ -195,7 +229,7 @@ public :
       if(gagne() || getCellRef(x,y).isBombe()) {
 	if(gagne()) {
 	  jeu.setEtat(victoire);
-	  saveScore();
+	  saveScore(nbLignes_, nbColonnes_);
 	}
 	else
 	  jeu.setEtat(perdu);

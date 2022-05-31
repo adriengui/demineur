@@ -4,7 +4,7 @@
 
 using namespace std;
 
-typedef enum {open = 0, closed, flag} State;
+typedef enum {open = 0, closed, flag, reclosed} State;
 
 class Cell {
 	private:
